@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10151d">
+<title>Конструктор дома TJ</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<style>
+:root{--bg:#0d1219;--panel:#151d28;--panel2:#1c2734;--line:#2b3949;--text:#f2f5f8;--muted:#9baaba;--gold:#e7b85c;--green:#7bc6a4;--danger:#e58b83}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+button,input,select{font:inherit}button{cursor:pointer;color:inherit;border:0}
+.app{height:100dvh;display:flex;flex-direction:column;position:relative;background:radial-gradient(ellipse at 50% 0%,#1b2a38 0%,#0d1219 60%)}
+.topbar{height:58px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid #263342;background:#101720eF;z-index:4}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.08em;font-size:13px}.logo{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#f2cb78,#b77d31);display:grid;place-items:center;color:#17202a;font-size:18px}
+.top-actions{display:flex;gap:8px}.ghost,.primary,.tab{border:1px solid var(--line);background:#1b2632;border-radius:12px;padding:9px 12px;font-size:12px;font-weight:700}.primary{background:var(--gold);color:#18202a;border-color:var(--gold)}.ghost:active,.primary:active,.tab:active{transform:scale(.98)}
+.scene-wrap{position:relative;flex:1;min-height:220px;overflow:hidden}.scene-wrap canvas{display:block;width:100%;height:100%;touch-action:none}
+.scene-label{position:absolute;top:14px;left:14px;padding:9px 12px;border:1px solid #52627366;background:#111923bb;backdrop-filter:blur(10px);border-radius:12px;font-size:11px;color:#d9e2eb;pointer-events:none}
+.scene-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#101720c9;border:1px solid #344354;border-radius:30px;padding:8px 13px;font-size:10px;color:#b7c4d1;pointer-events:none}
+.scene-tools{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:7px}.round{width:38px;height:38px;border-radius:12px;background:#172230df;border:1px solid #354454;font-size:18px}
+.drawer{height:48%;min-height:270px;max-height:64%;flex:none;background:linear-gradient(180deg,#17212d,#111923);border-top:1px solid #344252;border-radius:22px 22px 0 0;display:flex;flex-direction:column;z-index:3;box-shadow:0 -14px 40px #0005}
+.drawer-head{padding:10px 16px 0;flex:none}.handle{width:38px;height:4px;border-radius:9px;background:#536171;margin:0 auto 10px}.head-row{display:flex;align-items:center;justify-content:space-between}.head-row strong{font-size:14px}.sub{font-size:10px;color:var(--muted)}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:12px 14px 10px;scrollbar-width:none;flex:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;padding:9px 13px;color:#aebdcb}.tab.active{background:#e7b85c;color:#1b232d;border-color:#e7b85c}
+.content{overflow:auto;padding:0 15px 18px;flex:1;overscroll-behavior:contain}.section{display:none}.section.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{background:#1c2835;border:1px solid #2d3c4d;border-radius:13px;padding:10px 11px;margin-bottom:9px;min-width:0}.field label{display:block;color:#aebdcb;font-size:10px;margin-bottom:7px}.field input,.field select{width:100%;background:transparent;color:#f4f6f8;border:0;outline:0;font-weight:700;font-size:15px}.field select option{background:#1b2632}.unit{font-size:10px;color:#8292a3}
+.control-title{font-size:11px;color:#9eacba;margin:7px 0 8px;font-weight:700;text-transform:uppercase;letter-spacing:.08em}.choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px}.choice{background:#1b2734;border:1px solid #304052;border-radius:12px;padding:11px;text-align:left;min-height:53px}.choice b{display:block;font-size:12px}.choice small{display:block;color:#91a1b1;font-size:10px;margin-top:4px}.choice.selected{border-color:var(--gold);background:#3a3020}
+.inline{display:flex;align-items:center;justify-content:space-between;gap:12px}.switch{appearance:none;width:44px;height:25px;background:#425163;border-radius:20px;position:relative;outline:none;flex:none}.switch:checked{background:#b88a3e}.switch:before{content:"";position:absolute;width:19px;height:19px;top:3px;left:3px;border-radius:50%;background:white;transition:.2s}.switch:checked:before{left:22px}
+.note{font-size:10px;line-height:1.5;color:#9baaba;margin:8px 2px 12px}.notice{padding:11px 12px;background:#252c32;border:1px solid #665638;border-radius:12px;color:#e6c98e;font-size:10px;line-height:1.5;margin:10px 0}
+.spec-screen{position:absolute;inset:58px 0 0;background:#0e151e;z-index:6;display:none;flex-direction:column}.spec-screen.open{display:flex}.spec-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}.spec-head h2{font-size:17px;margin:0}.spec-body{overflow:auto;padding:12px 14px 24px}.spec-section{margin:12px 0 18px}.spec-section h3{font-size:12px;color:var(--gold);letter-spacing:.06em;text-transform:uppercase}.table-wrap{overflow-x:auto;border:1px solid #2b3949;border-radius:12px}table{border-collapse:collapse;width:100%;min-width:560px;font-size:11px}th,td{padding:9px 8px;text-align:left;border-bottom:1px solid #293645}th{color:#9cabb9;background:#17212c;font-weight:700}td input{width:82px;background:#0e151e;color:#f3f5f7;border:1px solid #405064;border-radius:7px;padding:6px;font-size:11px}.total{background:#1c2936;border:1px solid #405064;border-radius:15px;padding:15px;margin-top:15px}.total .amount{font-size:28px;font-weight:850;color:var(--gold);margin:5px 0}.total small{color:#aab8c6}.spec-actions{display:flex;gap:8px;margin-top:12px}.spec-actions button{flex:1}.empty{color:#96a5b4;font-size:12px;padding:12px}
+@media(min-width:800px){.app{max-width:1500px;margin:auto;border-left:1px solid #263342;border-right:1px solid #263342}.drawer{height:39%;max-height:440px}.content{padding-left:24px;padding-right:24px}.grid2{grid-template-columns:repeat(4,minmax(0,1fr))}.choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.topbar{padding:0 24px}}
+@media(max-height:650px){.drawer{height:44%;min-height:230px}.topbar{height:52px}.spec-screen{top:52px}}
+@media print{body{overflow:visible;background:white;color:#111}.app,.spec-head .top-actions{display:none!important}.spec-screen{display:block!important;position:static;background:white;color:#111}.spec-body{overflow:visible;padding:0}.spec-head{color:#111;border:0}.spec-section h3{color:#79551c}table{color:#111}th{background:#eee;color:#333}td input{border:0;color:#111;background:transparent}.total{background:#f5f5f5;color:#111}.total small{color:#333}}
+</style>
+</head>
+<body>
+<div class="app">
+ <header class="topbar">
+  <div class="brand"><div class="logo">⌂</div><span>КОНСТРУКТОР ДОМА <span style="color:var(--gold)">TJ</span></span></div>
+  <div class="top-actions"><button class="ghost" id="resetView" aria-label="Сбросить вид">⟳</button><button class="primary" id="openSpec">Смета ↗</button></div>
+ </header>
+ <main class="scene-wrap" id="sceneWrap">
+  <div class="scene-label">3D-ПРОЕКТ · <span id="dimensionLabel">10 × 8 м</span></div>
+  <div class="scene-tools"><button class="round" id="zoomIn">＋</button><button class="round" id="zoomOut">－</button><button class="round" id="rotateView">⟳</button></div>
+  <div class="scene-hint">Перетаскивай, чтобы вращать · двумя пальцами — масштаб</div>
+ </main>
+ <section class="drawer">
+  <div class="drawer-head"><div class="handle"></div><div class="head-row"><strong>Параметры строительства</strong><span class="sub">ИЗМЕНЕНИЯ СРАЗУ В 3D</span></div></div>
+  <nav class="tabs">
+   <button class="tab active" data-tab="size">Размеры</button><button class="tab" data-tab="foundation">Фундамент</button><button class="tab" data-tab="walls">Стены</button><button class="tab" data-tab="roof">Крыша</button><button class="tab" data-tab="openings">Окна и двери</button><button class="tab" data-tab="extras">Айван</button>
+  </nav>
+  <div class="content">
+   <div class="section active" id="size">
+    <div class="grid2">
+     <div class="field"><label>Длина дома</label><input type="number" id="length" min="4" max="30" step=".5" value="10"><span class="unit">метров</span></div>
+     <div class="field"><label>Ширина дома</label><input type="number" id="width" min="4" max="25" step=".5" value="8"><span class="unit">метров</span></div>
+     <div class="field"><label>Высота стен (этаж)</label><input type="number" id="wallHeight" min="2.3" max="4.5" step=".1" value="3"><span class="unit">метров</span></div>
+     <div class="field"><label>Количество этажей</label><select id="floors"><option value="1">1 этаж</option><option value="2">2 этажа</option></select></div>
+    </div>
+    <p class="note">Габариты задаются по наружному контуру стен. Для предварительной оценки; конструктивные решения должен проверить местный инженер.</p>
+   </div>
+   <div class="section" id="foundation">
+    <div class="control-title">Тип фундамента</div>
+    <div class="choice-grid" id="foundationChoices">
+     <button class="choice selected" data-value="strip"><b>Ленточный бетонный</b><small>Железобетонная лента</small></button>
+     <button class="choice" data-value="rubble"><b>Бутовый камень</b><small>Каменная кладка</small></button>
+     <button class="choice" data-value="slab"><b>Монолитная плита</b><small>Плита под всем домом</small></button>
+    </div>
+    <div class="notice">Размеры фундамента здесь оценочные. Тип и глубина зависят от грунта, сейсмичности, грунтовых вод и расчёта конструктора.</div>
+   </div>
+   <div class="section" id="walls">
+    <div class="control-title">Материал наружных стен</div>
+    <div class="choice-grid" id="wallChoices">
+     <button class="choice selected" data-value="brick"><b>Жжёный кирпич</b><small>Керамическая кладка</small></button>
+     <button class="choice" data-value="adobe"><b>Сырцовый кирпич</b><small>Саманный блок</small></button>
+     <button class="choice" data-value="slag"><b>Шлакоблок</b><small>Блоковая кладка</small></button>
+     <button class="choice" data-value="foam"><b>Пеноблок</b><small>Ячеистый бетон</small></button>
+     <button class="choice" data-value="paksa"><b>Глинобитная (пахса)</b><small>Утрамбованная глина</small></button>
+    </div>
+    <div class="grid2"><div class="field"><label>Толщина стены</label><select id="wallThickness"><option value=".25">25 см</option><option value=".30" selected>30 см</option><option value=".38">38 см</option><option value=".40">40 см</option></select></div><div class="field"><label>Запас материалов</label><select id="waste"><option value="5">5%</option><option value="7" selected>7%</option><option value="10">10%</option></select></div></div>
+   </div>
+   <div class="section" id="roof">
+    <div class="control-title">Форма крыши</div>
+    <div class="choice-grid" id="roofChoices">
+     <button class="choice selected" data-value="flat"><b>Плоская традиционная</b><small>С небольшим уклоном</small></button>
+     <button class="choice" data-value="gable"><b>Двускатная</b><small>Два ската</small></button>
+     <button class="choice" data-value="hip"><b>Четырёхскатная</b><small>Вальмовая</small></button>
+    </div>
+    <div class="control-title">Кровельное покрытие</div>
+    <div class="choice-grid" id="coverChoices">
+     <button class="choice selected" data-value="slate"><b>Шифер</b><small>Листовое покрытие</small></button>
+     <button class="choice" data-value="metal"><b>Металлочерепица</b><small>Профилированный металл</small></button>
+     <button class="choice" data-value="profile"><b>Профнастил</b><small>Металлический лист</small></button>
+    </div>
+   </div>
+   <div class="section" id="openings">
+    <div class="grid2">
+     <div class="field"><label>Количество окон</label><input type="number" id="windowCount" min="0" max="40" value="8"></div>
+     <div class="field"><label>Количество дверей</label><input type="number" id="doorCount" min="1" max="12" value="2"></div>
+     <div class="field"><label>Ширина окна</label><input type="number" id="windowW" min=".5" max="3" step=".1" value="1.2"><span class="unit">метров</span></div>
+     <div class="field"><label>Высота окна</label><input type="number" id="windowH" min=".5" max="2.5" step=".1" value="1.4"><span class="unit">метров</span></div>
+     <div class="field"><label>Ширина двери</label><input type="number" id="doorW" min=".6" max="2" step=".1" value=".9"><span class="unit">метров</span></div>
+     <div class="field"><label>Высота двери</label><input type="number" id="doorH" min="1.7" max="2.8" step=".1" value="2.1"><span class="unit">метров</span></div>
+    </div>
+    <p class="note">Проёмы автоматически вычитаются из площади кладки. Для 3D окна и двери равномерно распределяются по наружным стенам.</p>
+   </div>
+   <div class="section" id="extras">
+    <div class="field inline"><div><b style="font-size:13px">Айван / веранда</b><div class="unit">Открытая веранда вдоль фасада</div></div><input class="switch" type="checkbox" id="ivan"></div>
+    <div class="grid2"><div class="field"><label>Глубина айвана</label><input type="number" id="ivanDepth" min="1" max="4" step=".2" value="2"><span class="unit">метров</span></div><div class="field"><label>Ширина по фасаду</label><input type="number" id="ivanWidth" min="2" max="20" step=".5" value="6"><span class="unit">метров</span></div></div>
+    <p class="note">Айван показан в 3D. В текущей версии его отдельная конструкция и отделка не включены в смету.</p>
+   </div>
+  </div>
+ </section>
+ <section class="spec-screen" id="specScreen">
+  <div class="spec-head"><h2>Смета строительства</h2><div class="top-actions"><button class="ghost" id="closeSpec">← Назад</button></div></div>
+  <div class="spec-body" id="specBody">
+   <div class="notice">Цены примерные, зависят от города и сезона, проверь у продавца. Это предварительная оценка, не рабочая строительная смета.</div>
+   <div id="specTables"></div>
+   <div class="total"><small>ОРИЕНТИРОВОЧНАЯ СТОИМОСТЬ</small><div class="amount" id="grandTotal">0 сомони</div><small id="totalNote"></small></div>
+   <div class="spec-actions"><button class="primary" id="copySpec">Скопировать текст</button><button class="ghost" id="printSpec">Печать / PDF</button></div>
+   <button class="ghost" id="resetPrices" style="width:100%;margin-top:9px">Сбросить цены</button>
+   <p class="note">Цены редактируются прямо в таблице и сохраняются в этом браузере. Расчёт не включает доставку, работу, инженерные сети, отделку, армирование по проекту и налоги.</p>
+  </div>
+ </section>
+</div>
+<script>
+"use strict";
+
+/* НОРМЫ И ПРИМЕРНЫЕ ЦЕНЫ — редактируйте значения здесь.
+   Нормы ориентировочные для предварительной оценки, не заменяют проект/сметные нормы.
+   Там, где нет подтверждённой единой нормы/цены для Таджикистана, указана условная стартовая оценка. */
+const MATERIALS = {
+ foundation:{
+  strip:{name:"Бетон для ленточного фундамента",unit:"м³",price:950,kind:"concrete"},
+  rubble:{name:"Бутовый камень",unit:"м³",price:500,kind:"rubble"},
+  slab:{name:"Бетон для монолитной плиты",unit:"м³",price:950,kind:"concrete"}
+ },
+ wall:{
+  brick:{name:"Жжёный кирпич",unit:"шт.",price:1.8,perM2:102,thickness:.30},
+  adobe:{name:"Сырцовый кирпич",unit:"шт.",price:1.1,perM2:52,thickness:.30},
+  slag:{name:"Шлакоблок",unit:"шт.",price:8,perM2:12.5,thickness:.20},
+  foam:{name:"Пеноблок",unit:"шт.",price:12,perM2:8.3,thickness:.30},
+  paksa:{name:"Глинобитная масса (пахса)",unit:"м³",price:420,perM2:null,thickness:.40}
+ },
+ roof:{
+  slate:{name:"Шифер",unit:"м²",price:65},
+  metal:{name:"Металлочерепица",unit:"м²",price:105},
+  profile:{name:"Профнастил",unit:"м²",price:85}
+ },
+ opening:{
+  window:{name:"Окно (комплект)",unit:"шт.",price:950},
+  door:{name:"Дверь (комплект)",unit:"шт.",price:1200}
+ },
+ norms:{
+  stripWidth:.50, stripDepth:.70, slabThickness:.18, roofOverhang:.45,
+  roofWaste:1.10, concreteWaste:1.05, rubbleWaste:1.08,
+  paksaWaste:1.08
+ }
+};
+const DEFAULT_PRICES={}; 
+Object.values(MATERIALS.foundation).forEach(x=>DEFAULT_PRICES[x.name]=x.price);
+Object.values(MATERIALS.wall).forEach(x=>DEFAULT_PRICES[x.name]=x.price);
+Object.values(MATERIALS.roof).forEach(x=>DEFAULT_PRICES[x.name]=x.price);
+Object.values(MATERIALS.opening).forEach(x=>DEFAULT_PRICES[x.name]=x.price);
+let prices={...DEFAULT_PRICES};
+try{const saved=JSON.parse(localStorage.getItem("homeTJ_prices")||"{}");prices={...prices,...saved};}catch(e){}
+const state={foundation:"strip",wall:"brick",roof:"flat",cover:"slate"};
+const $=id=>document.getElementById(id);
+const num=(id,def)=>{const v=parseFloat($(id).value);return Number.isFinite(v)?v:def};
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
+function getConfig(){
+ const L=clamp(num("length",10),4,30),W=clamp(num("width",8),4,25),h=clamp(num("wallHeight",3),2.3,4.5),floors=clamp(num("floors",1),1,2);
+ const wc=clamp(Math.round(num("windowCount",8)),0,40),dc=clamp(Math.round(num("doorCount",2)),1,12);
+ return {L,W,h,floors,H:h*floors,wc,dc,ww:clamp(num("windowW",1.2),.5,3),wh:clamp(num("windowH",1.4),.5,2.5),dw:clamp(num("doorW",.9),.6,2),dh:clamp(num("doorH",2.1),1.7,2.8),th:clamp(num("wallThickness",.3),.2,.4),waste:clamp(num("waste",7),5,10)/100,ivan:$("ivan").checked,ivd:clamp(num("ivanDepth",2),1,4),ivw:clamp(num("ivanWidth",6),2,20)};
+}
+function calc(){
+ const c=getConfig(),perimeter=2*(c.L+c.W);
+ const gross=perimeter*c.H;
+ const openings=c.wc*c.ww*c.wh+c.dc*c.dw*c.dh;
+ const wallArea=Math.max(0,gross-openings);
+ const wallVol=wallArea*c.th;
+ let foundationQty=0,foundationMat;
+ if(state.foundation==="strip"){foundationQty=perimeter*MATERIALS.norms.stripWidth*MATERIALS.norms.stripDepth*MATERIALS.norms.concreteWaste;foundationMat=MATERIALS.foundation.strip;}
+ if(state.foundation==="rubble"){foundationQty=perimeter*.5*.7*MATERIALS.norms.rubbleWaste;foundationMat=MATERIALS.foundation.rubble;}
+ if(state.foundation==="slab"){foundationQty=c.L*c.W*MATERIALS.norms.slabThickness*MATERIALS.norms.concreteWaste;foundationMat=MATERIALS.foundation.slab;}
+ const wm=MATERIALS.wall[state.wall];
+ let wallQty=state.wall==="paksa"?wallVol*MATERIALS.norms.paksaWaste:wallArea*(wm.perM2||0)*(c.th/(wm.thickness||c.th))*(1+c.waste);
+ const roofBase=(c.L+MATERIALS.norms.roofOverhang*2)*(c.W+MATERIALS.norms.roofOverhang*2);
+ let roofArea=roofBase;
+ if(state.roof==="gable"){const rise=c.W*.22;roofArea=(c.L+0.9*2)*2*Math.sqrt((c.W/2+.45)**2+rise**2);}
+ if(state.roof==="hip"){const rise=Math.min(c.L,c.W)*.20;roofArea=2*(c.L+0.9)*Math.sqrt(((c.W+0.9)/2)**2+rise**2)+2*(c.W+0.9)*Math.sqrt(((c.L+0.9)/2)**2+rise**2)*.25;}
+ roofArea*=MATERIALS.norms.roofWaste;
+ return {c,perimeter,gross,openings,wallArea,wallVol,foundationQty,foundationMat,wallQty,wm,roofArea,windowQty:c.wc,doorQty:c.dc};
+}
+function price(name){return Number(prices[name]??DEFAULT_PRICES[name]??0)||0;}
+function fmt(n){return new Intl.NumberFormat("ru-RU",{maximumFractionDigits:2}).format(n);}
+function makeRows(){
+ const d=calc(),rows={foundation:[],walls:[],roof:[],openings:[]};
+ rows.foundation.push({name:d.foundationMat.name,unit:d.foundationMat.unit,qty:d.foundationQty});
+ rows.walls.push({name:d.wm.name,unit:d.wm.unit,qty:d.wallQty});
+ rows.roof.push({name:MATERIALS.roof[state.cover].name,unit:"м²",qty:d.roofArea});
+ if(d.windowQty)rows.openings.push({name:MATERIALS.opening.window.name,unit:"шт.",qty:d.windowQty});
+ if(d.doorQty)rows.openings.push({name:MATERIALS.opening.door.name,unit:"шт.",qty:d.doorQty});
+ return rows;
+}
+function renderSpec(){
+ const rows=makeRows();let total=0,html="";
+ const titles={foundation:"Фундамент",walls:"Стены",roof:"Крыша",openings:"Окна и двери"};
+ Object.keys(rows).forEach(key=>{
+  html+=`<div class="spec-section"><h3>${titles[key]}</h3><div class="table-wrap"><table><thead><tr><th>Материал</th><th>Ед.</th><th>Количество</th><th>Цена / ед., TJS</th><th>Сумма, TJS</th></tr></thead><tbody>`;
+  rows[key].forEach((r,i)=>{const p=price(r.name),sum=p*r.qty;total+=sum;html+=`<tr><td>${r.name}</td><td>${r.unit}</td><td>${fmt(r.qty)}</td><td><input type="number" min="0" step=".1" data-price="${encodeURIComponent(r.name)}" value="${p}"></td><td>${fmt(sum)}</td></tr>`;});
+  html+="</tbody></table></div></div>";
+ });
+ $("specTables").innerHTML=html;$("grandTotal").textContent=fmt(total)+" сомони";
+ $("totalNote").textContent=`Дом ${d.c.L} × ${d.c.W} м · ${d.c.floors} эт. · площадь кладки ${fmt(d.wallArea)} м² · запас на отходы ${Math.round(d.c.waste*100)}% (для кладки)`;
+ $("specTables").querySelectorAll("[data-price]").forEach(inp=>inp.addEventListener("change",()=>{const name=decodeURIComponent(inp.dataset.price);prices[name]=Math.max(0,Number(inp.value)||0);try{localStorage.setItem("homeTJ_prices",JSON.stringify(prices));}catch(e){}renderSpec();}));
+}
+function buildModel(){
+ if(!window.THREE)return;
+ const d=calc(),c=d.c;
+ while(model.children.length){const o=model.children.pop();dispose(o);}
+ const wallColor={brick:0xa9563c,adobe:0xc49a61,slag:0x89919a,foam:0xd5d1c3,paksa:0xa77b4d}[state.wall];
+ const wallMat=new THREE.MeshStandardMaterial({color:wallColor,roughness:.92});
+ const trimMat=new THREE.MeshStandardMaterial({color:0xeee5d4,roughness:.7});
+ const foundationMat=new THREE.MeshStandardMaterial({color:state.foundation==="rubble"?0x77736b:0x777f87,roughness:1});
+ const roofMat=new THREE.MeshStandardMaterial({color:state.cover==="slate"?0x53616b:state.cover==="metal"?0x7b4b39:0x536c70,roughness:.75,side:THREE.DoubleSide});
+ const floorY=.22,wallY=.62;
+ // Ground/foundation plinth
+ addBox(c.L+.35,.35,c.W+.35,0,.175,0,foundationMat);
+ // Wall segments are split around façade openings so windows/doors are real voids.
+ const frontZ=-c.W/2,backZ=c.W/2,leftX=-c.L/2,rightX=c.L/2;
+ const windowsPerWall=[Math.ceil(c.wc*.4),Math.floor(c.wc*.4),Math.ceil(c.wc*.1),Math.floor(c.wc*.1)];
+ const doorsPerWall=[1,0,0,Math.max(0,c.dc-1)];
+ const walls=[
+  {len:c.L,x:0,z:frontZ,rot:0,nw:windowsPerWall[0],nd:doorsPerWall[0]},
+  {len:c.L,x:0,z:backZ,rot:0,nw:windowsPerWall[1],nd:doorsPerWall[1]},
+  {len:c.W,x:leftX,z:0,rot:Math.PI/2,nw:windowsPerWall[2],nd:doorsPerWall[2]},
+  {len:c.W,x:rightX,z:0,rot:Math.PI/2,nw:windowsPerWall[3],nd:doorsPerWall[3]}
+ ];
+ walls.forEach((w,wi)=>buildWallWithOpenings(w,c.H,c.th,wallMat,trimMat));
+ // floor bands between floors
+ if(c.floors===2){for(let f=1;f<c.floors;f++)addBox(c.L+.06,.12,c.W+.06,0,wallY+f*c.h-.06,0,trimMat);}
+ // Roof
+ const roofY=wallY+c.H+.08;
+ if(state.roof==="flat"){
+  addBox(c.L+.9,.22,c.W+.9,0,roofY+.1,0,roofMat);
+  // low parapet
+  addBox(c.L+.9,.25,.12,0,roofY+.31,-(c.W+.9)/2,trimMat);
+  addBox(c.L+.9,.25,.12,0,roofY+.31,(c.W+.9)/2,trimMat);
+ }else if(state.roof==="gable"){
+  const rise=c.W*.22;
+  const geo=new THREE.BufferGeometry();
+  const verts=[-c.L/2,roofY,-c.W/2-.45,c.L/2,roofY,-c.W/2-.45,0,roofY+rise,0,
+   -c.L/2,roofY,c.W/2+.45,c.L/2,roofY,c.W/2+.45,0,roofY+rise,0];
+  geo.setAttribute("position",new THREE.Float32BufferAttribute(verts,3));geo.setIndex([0,1,2,3,5,4,0,2,3,1,4,2,0,3,1,3,4,1]);geo.computeVertexNormals();
+  const mesh=new THREE.Mesh(geo,roofMat);model.add(mesh);
+  addBox(c.L+.9,.12,.12,0,roofY,0,trimMat);
+ }else{
+  const roofGeo=new THREE.ConeGeometry(1,1,4);roofGeo.rotateY(Math.PI/4);
+  const mesh=new THREE.Mesh(roofGeo,roofMat);mesh.scale.set(c.L*.72,Math.min(c.L,c.W)*.32,c.W*.72);mesh.position.set(0,roofY+Math.min(c.L,c.W)*.15,0);model.add(mesh);
+ }
+ // Ivan along front facade
+ if(c.ivan){
+  const iw=Math.min(c.ivw,c.L-.5),depth=c.ivd;
+  addBox(iw,.16,depth,0,wallY-.03,frontZ-depth/2,foundationMat);
+  for(let i=0;i<4;i++){const x=-iw/2+iw*i/3;addBox(.13,c.H*.78,.13,x,wallY+c.H*.39,frontZ-depth+.08,trimMat);}
+  addBox(iw,.14,.16,0,wallY+c.H*.78,frontZ-depth+.08,trimMat);
+  const canopy=new THREE.Mesh(new THREE.BoxGeometry(iw,.13,depth),roofMat);canopy.position.set(0,wallY+c.H*.82,frontZ-depth/2);model.add(canopy);
+ }
+ // Ground plane
+ const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0x202d31,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.015;model.add(ground);
+ $("dimensionLabel").textContent=`${c.L} × ${c.W} м`;
+}
+function addBox(x,y,z,px,py,pz,mat){const m=new THREE.Mesh(new THREE.BoxGeometry(x,y,z),mat);m.position.set(px,py,pz);model.add(m);return m;}
+function buildWallWithOpenings(w,height,th,mat,trim){
+ const count=w.nw+w.nd,openings=[];
+ for(let i=0;i<w.nd;i++)openings.push({center:-w.len/2+(i+1)*w.len/(w.nd+1),width:getConfig().dw,bottom:0,height:getConfig().dh,type:"door"});
+ for(let i=0;i<w.nw;i++)openings.push({center:-w.len/2+(i+1)*w.len/(w.nw+1),width:getConfig().ww,bottom:Math.max(.85,getConfig().dh*.45),height:getConfig().wh,type:"window"});
+ openings.sort((a,b)=>a.center-b.center);
+ let cursor=-w.len/2;
+ openings.forEach(o=>{
+  const start=o.center-o.width/2,end=o.center+o.width/2;
+  const seg=start-cursor;if(seg>.01)addWallSegment(w,cursor+seg/2,seg,height,th,mat);
+  if(o.type==="window"){
+   addWallSegment(w,o.center,o.width,o.bottom,th,mat,.0);
+   addWallSegment(w,o.center,o.width,Math.max(0,height-(o.bottom+o.height)),th,mat,o.bottom+o.height);
+   // sill and lintel accent
+   addOpeningTrim(w,o.center,o.width,th,o.bottom,trim,false);
+   addOpeningTrim(w,o.center,o.width,th,o.bottom+o.height,trim,false);
+   addWindowGlass(w,o.center,o.width,th,o.bottom,o.height);
+  }else{
+   addWallSegment(w,o.center,o.width,Math.max(0,height-o.height),th,mat,o.height);
+   addOpeningTrim(w,o.center,o.width,th,o.height,trim,true);
+   addDoorLeaf(w,o.center,o.width,th,o.height);
+  }
+  cursor=end;
+ });
+ const rem=w.len/2-cursor;if(rem>.01)addWallSegment(w,cursor+rem/2,rem,height,th,mat);
+ if(!count)addWallSegment(w,0,w.len,height,th,mat);
+}
+function addWallSegment(w,along,len,h,th,mat,bottom=0){
+ if(len<=.01||h<=.01)return;
+ const geo=new THREE.BoxGeometry(len,h,th);const m=new THREE.Mesh(geo,mat);
+ if(w.rot===0)m.position.set(w.x+along,bottom+h/2,w.z);else m.position.set(w.x,bottom+h/2,w.z+along);
+ if(w.rot!==0)m.rotation.y=Math.PI/2;
+ model.add(m);
+}
+function addOpeningTrim(w,center,width,th,y,mat,door){
+ const bar=new THREE.Mesh(new THREE.BoxGeometry(width+.08,.08,th+.04),mat);
+ if(w.rot===0)bar.position.set(w.x+center,y,w.z);else{bar.position.set(w.x,y,w.z+center);bar.rotation.y=Math.PI/2;}
+ model.add(bar);
+}
+function addWindowGlass(w,center,width,th,bottom,height){
+ const glass=new THREE.MeshStandardMaterial({color:0x8db6c4,metalness:.35,roughness:.2,transparent:true,opacity:.65});
+ const pane=new THREE.Mesh(new THREE.BoxGeometry(width-.12,height-.12,.035),glass);
+ if(w.rot===0)pane.position.set(w.x+center,bottom+height/2,w.z);else{pane.position.set(w.x,bottom+height/2,w.z+center);pane.rotation.y=Math.PI/2;}
+ model.add(pane);
+ const frame=new THREE.MeshStandardMaterial({color:0xe9e0cf});
+ const v1=new THREE.Mesh(new THREE.BoxGeometry(.055,height,.06),frame),v2=v1.clone();
+ const h1=new THREE.Mesh(new THREE.BoxGeometry(width,.055,.06),frame),h2=h1.clone();
+ [v1,v2,h1,h2].forEach(m=>{if(w.rot===0)m.position.set(w.x+center,bottom+height/2,w.z);else{m.position.set(w.x,bottom+height/2,w.z+center);m.rotation.y=Math.PI/2;}});
+ if(w.rot===0){v1.position.x-=width/2;v2.position.x+=width/2;h1.position.y=bottom;h2.position.y=bottom+height;}else{v1.position.z-=width/2;v2.position.z+=width/2;h1.position.y=bottom;h2.position.y=bottom+height;}
+ model.add(v1,v2,h1,h2);
+}
+function addDoorLeaf(w,center,width,th,height){
+ const mat=new THREE.MeshStandardMaterial({color:0x77523a,roughness:.8});
+ const door=new THREE.Mesh(new THREE.BoxGeometry(width-.08,height-.08,.05),mat);
+ if(w.rot===0)door.position.set(w.x+center,height/2,w.z);else{door.position.set(w.x,height/2,w.z+center);door.rotation.y=Math.PI/2;}
+ model.add(door);
+}
+function dispose(obj){if(obj.geometry)obj.geometry.dispose();if(obj.material){if(Array.isArray(obj.material))obj.material.forEach(m=>m.dispose());else obj.material.dispose();}}
+let renderer,scene,camera,model,drag=false,lastX=0,lastY=0,pinch=0,rotY=-.65,rotX=.35,dist=22;
+function init3D(){
+ const host=$("sceneWrap");scene=new THREE.Scene();scene.background=new THREE.Color(0x101923);
+ camera=new THREE.PerspectiveCamera(42,1,.1,500);
+ renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;host.appendChild(renderer.domElement);
+ scene.add(new THREE.HemisphereLight(0xc8d9e8,0x3c342b,2));
+ const key=new THREE.DirectionalLight(0xffe3b5,2.3);key.position.set(-10,18,12);key.castShadow=true;scene.add(key);
+ const fill=new THREE.DirectionalLight(0x8caec9,1.1);fill.position.set(12,9,-12);scene.add(fill);
+ model=new THREE.Group();scene.add(model);
+ const resize=()=>{const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();};
+ new ResizeObserver(resize).observe(host);resize();
+ const el=renderer.domElement;
+ el.addEventListener("pointerdown",e=>{drag=true;lastX=e.clientX;lastY=e.clientY;el.setPointerCapture(e.pointerId);});
+ el.addEventListener("pointermove",e=>{if(!drag)return;rotY+=(e.clientX-lastX)*.009;rotX=clamp(rotX+(e.clientY-lastY)*.006,-.15,1.05);lastX=e.clientX;lastY=e.clientY;});
+ el.addEventListener("pointerup",()=>drag=false);el.addEventListener("pointercancel",()=>drag=false);
+ el.addEventListener("wheel",e=>{dist=clamp(dist+e.deltaY*.018,8,55);e.preventDefault();},{passive:false});
+ el.addEventListener("touchstart",e=>{if(e.touches.length===2)pinch=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);},{passive:true});
+ el.addEventListener("touchmove",e=>{if(e.touches.length===2){const n=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(pinch)dist=clamp(dist+(pinch-n)*.035,8,55);pinch=n;}},{passive:true});
+ function animate(){requestAnimationFrame(animate);const d=calc(),target=new THREE.Vector3(0,d.c.H*.55,0);const r=dist;camera.position.set(target.x+r*Math.sin(rotY)*Math.cos(rotX),target.y+r*Math.sin(rotX),target.z+r*Math.cos(rotY)*Math.cos(rotX));camera.lookAt(target);renderer.render(scene,camera);}
+ buildModel();animate();
+}
+function updateModel(){buildModel();renderSpec();}
+document.querySelectorAll(".tabs .tab").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".tabs .tab").forEach(x=>x.classList.toggle("active",x===btn));document.querySelectorAll(".section").forEach(x=>x.classList.toggle("active",x.id===btn.dataset.tab));}));
+function bindChoices(id,key){$(id).querySelectorAll(".choice").forEach(b=>b.addEventListener("click",()=>{$(id).querySelectorAll(".choice").forEach(x=>x.classList.toggle("selected",x===b));state[key]=b.dataset.value;updateModel();}));}
+bindChoices("foundationChoices","foundation");bindChoices("wallChoices","wall");bindChoices("roofChoices","roof");bindChoices("coverChoices","cover");
+["length","width","wallHeight","floors","wallThickness","waste","windowCount","doorCount","windowW","windowH","doorW","doorH","ivan","ivanDepth","ivanWidth"].forEach(id=>$(id).addEventListener("input",updateModel));
+$("openSpec").addEventListener("click",()=>{$("specScreen").classList.add("open");renderSpec();});
+$("closeSpec").addEventListener("click",()=>$("specScreen").classList.remove("open"));
+$("zoomIn").addEventListener("click",()=>dist=clamp(dist-2,8,55));$("zoomOut").addEventListener("click",()=>dist=clamp(dist+2,8,55));
+$("rotateView").addEventListener("click",()=>{rotY=-.65;rotX=.35;});$("resetView").addEventListener("click",()=>{rotY=-.65;rotX=.35;dist=22;});
+$("resetPrices").addEventListener("click",()=>{prices={...DEFAULT_PRICES};try{localStorage.removeItem("homeTJ_prices");}catch(e){}renderSpec();});
+function specText(){
+ const rows=makeRows(),d=calc();let out=["СМЕТА — КОНСТРУКТОР ДОМА TJ",`Размеры: ${d.c.L} × ${d.c.W} м, этажей: ${d.c.floors}, высота стен: ${d.c.h} м`,`Площадь кладки с вычетом проёмов: ${fmt(d.wallArea)} м²`,`Запас на отходы: ${Math.round(d.c.waste*100)}%`,""];
+ let total=0;Object.entries(rows).forEach(([k,list])=>{out.push(k.toUpperCase());list.forEach(r=>{const s=price(r.name)*r.qty;total+=s;out.push(`${r.name}: ${fmt(r.qty)} ${r.unit} × ${fmt(price(r.name))} = ${fmt(s)} TJS`);});});
+ out.push("",`ИТОГО: ${fmt(total)} сомони`,"Цены примерные; проверьте у продавца. Предварительная оценка, не рабочая смета.");return out.join("\n");
+}
+$("copySpec").addEventListener("click",async()=>{const t=specText();try{await navigator.clipboard.writeText(t);$("copySpec").textContent="Скопировано ✓";setTimeout(()=>$("copySpec").textContent="Скопировать текст",1800);}catch(e){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();$("copySpec").textContent="Скопировано ✓";setTimeout(()=>$("copySpec").textContent="Скопировать текст",1800);}});
+$("printSpec").addEventListener("click",()=>window.print());
+if(window.THREE)init3D();else{$("sceneWrap").insertAdjacentHTML("beforeend",'<div class="notice" style="position:absolute;top:50%;left:15px;right:15px">Не удалось загрузить Three.js. Проверьте подключение к интернету и обновите страницу.</div>');}
+</script>
+</body>
+</html>
