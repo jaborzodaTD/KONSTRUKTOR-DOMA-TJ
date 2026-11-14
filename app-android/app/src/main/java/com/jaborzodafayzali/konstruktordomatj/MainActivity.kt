@@ -220,11 +220,11 @@ class MainActivity : ComponentActivity() {
     val perimeter=2*(length+width)
     val wallArea=max(0f,perimeter*height*floors-windows*1.5f-doors*1.9f)
     val roofArea=length*width*1.12f
-    val foundation=perimeter*.5f*.65f
+    val foundationVolume=perimeter*.5f*.65f
     val wallRate=when(wall){"Кирпич"->420f;"Саман"->180f;"Газоблок"->390f;"Шлакоблок"->300f;else->250f}
     val foundationRate=when(foundation){"Ленточный бетон"->900f;"Бутовый"->750f;else->1100f}
     val roofRate=when(roof){"Плоская"->280f;"Вальмовая"->420f;else->350f}
-    val total=wallArea*wallRate+foundation*foundationRate+roofArea*roofRate+windows*650f+doors*900f
+    val total=wallArea*wallRate+foundationVolume*foundationRate+roofArea*roofRate+windows*650f+doors*900f
     Column(modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(16.dp)) {
         Text("ПРЕДВАРИТЕЛЬНАЯ СМЕТА", color=Ink, fontSize=19.sp, fontWeight=FontWeight.Bold)
         Text("Ориентировочные ставки — не коммерческое предложение", color=Muted, fontSize=11.sp)
@@ -233,7 +233,7 @@ class MainActivity : ComponentActivity() {
         }
         EstimateLine("Площадь стен (нетто)", "${"%.1f".format(wallArea)} м²")
         EstimateLine("Кровля", "${"%.1f".format(roofArea)} м² · $roof")
-        EstimateLine("Фундамент", "${"%.1f".format(foundation)} м³ · $foundation")
+        EstimateLine("Фундамент", "${"%.1f".format(foundationVolume)} м³ · $foundation")
         EstimateLine("Стены", wall)
         EstimateLine("Окна / двери", "$windows / $doors шт.")
         val converted=if(currency=="KZT") total*55f else total
