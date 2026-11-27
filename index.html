@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#10151d">
-<title>Конструктор дома TJ</title>
+<title>TAJIKBUILD — 3D-конструктор домов и расчёт строительства</title>
+<meta name="description" content="TAJIKBUILD — проектируйте дом в 3D и рассчитывайте строительные материалы и предварительную стоимость в сомони. Начинаем с Таджикистана, развиваем платформу для других стран.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
 <style>
 :root{--bg:#0d1219;--panel:#151d28;--panel2:#1c2734;--line:#2b3949;--text:#f2f5f8;--muted:#9baaba;--gold:#e7b85c;--green:#7bc6a4;--danger:#e58b83}
@@ -35,7 +36,7 @@ button,input,select{font:inherit}button{cursor:pointer;color:inherit;border:0}
 <body>
 <div class="app">
  <header class="topbar">
-  <div class="brand"><div class="logo">⌂</div><span>КОНСТРУКТОР ДОМА <span style="color:var(--gold)">TJ</span></span></div>
+  <div class="brand"><div class="logo">⌂</div><span>TAJIK<span style="color:var(--gold)">BUILD</span><small style="display:block;font-size:8px;letter-spacing:.16em;color:var(--muted);font-weight:600;margin-top:2px">BUILD YOUR FUTURE</small></span></div>
   <div class="top-actions"><button class="ghost" id="resetView" aria-label="Сбросить вид">⟳</button><button class="primary" id="openSpec">Смета ↗</button></div>
  </header>
  <main class="scene-wrap" id="sceneWrap">
@@ -360,7 +361,7 @@ $("zoomIn").addEventListener("click",()=>dist=clamp(dist-2,8,55));$("zoomOut").a
 $("rotateView").addEventListener("click",()=>{rotY=-.65;rotX=.35;});$("resetView").addEventListener("click",()=>{rotY=-.65;rotX=.35;dist=22;});
 $("resetPrices").addEventListener("click",()=>{prices={...DEFAULT_PRICES};try{localStorage.removeItem("homeTJ_prices");}catch(e){}renderSpec();});
 function specText(){
- const rows=makeRows(),d=calc();let out=["СМЕТА — КОНСТРУКТОР ДОМА TJ",`Размеры: ${d.c.L} × ${d.c.W} м, этажей: ${d.c.floors}, высота стен: ${d.c.h} м`,`Площадь кладки с вычетом проёмов: ${fmt(d.wallArea)} м²`,`Запас на отходы: ${Math.round(d.c.waste*100)}%`,""];
+ const rows=makeRows(),d=calc();let out=["СМЕТА — TAJIKBUILD",`Размеры: ${d.c.L} × ${d.c.W} м, этажей: ${d.c.floors}, высота стен: ${d.c.h} м`,`Площадь кладки с вычетом проёмов: ${fmt(d.wallArea)} м²`,`Запас на отходы: ${Math.round(d.c.waste*100)}%`,""];
  let total=0;Object.entries(rows).forEach(([k,list])=>{out.push(k.toUpperCase());list.forEach(r=>{const s=price(r.name)*r.qty;total+=s;out.push(`${r.name}: ${fmt(r.qty)} ${r.unit} × ${fmt(price(r.name))} = ${fmt(s)} TJS`);});});
  out.push("",`ИТОГО: ${fmt(total)} сомони`,"Цены примерные; проверьте у продавца. Предварительная оценка, не рабочая смета.");return out.join("\n");
 }
